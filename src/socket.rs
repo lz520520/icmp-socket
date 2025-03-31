@@ -89,7 +89,12 @@ impl IcmpSocket4 {
             },
         })
     }
-
+    pub fn set_mtu(&mut self, mtu: usize) -> std::io::Result<()> {
+        self.inner.set_send_buffer_size(mtu)?;
+        self.inner.set_recv_buffer_size(mtu)?;
+        self.buf = vec![0; mtu];
+        Ok(())
+    }
     /// Construct a new dgram socket. The socket must be bound to an address using `bind_to`
     /// before it can be used to send and receive packets.
     pub fn new_dgram_socket() -> std::io::Result<Self> {
@@ -152,6 +157,12 @@ impl IcmpSocket6 {
     pub fn new() -> std::io::Result<Self> {
         let socket = Socket::new(Domain::IPV6, Type::RAW, Some(Protocol::ICMPV6))?;
         Self::new_from_socket(socket)
+    }
+    pub fn set_mtu(&mut self, mtu: usize) -> std::io::Result<()> {
+        self.inner.set_send_buffer_size(mtu)?;
+        self.inner.set_recv_buffer_size(mtu)?;
+        self.buf = vec![0; mtu];
+        Ok(())
     }
 
     fn new_from_socket(socket: Socket) -> std::io::Result<Self> {
